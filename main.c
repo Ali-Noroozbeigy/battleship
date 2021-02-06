@@ -132,7 +132,7 @@ void createBoard(char player)
 
 /*
 gets the coordinates of ships
-and shows the preview of each player's ship
+and shows the preview of each player's map
 */
 void putShips(char player)
 {
@@ -225,7 +225,6 @@ void putShips(char player)
                  {
                   player1[firstRow-1][j-65].state='o';
                   player1[firstRow-1][j-65].isShip=true;
-                  createNode('H',firstRow-1,firstC-65,len,'1');
                   if (firstRow>=2)
                     player1[firstRow-2][j-65].isReserved=true;
                   if (firstRow<=9)
@@ -235,13 +234,16 @@ void putShips(char player)
                  {
                   player2[firstRow-1][j-65].state='o';
                   player2[firstRow-1][j-65].isShip=true;
-                  createNode('H',firstRow-1,firstC-65,len,'2');
                   if (firstRow>=2)
                     player2[firstRow-2][j-65].isReserved=true;
                   if (firstRow<=9)
                     player2[firstRow][j-65].isReserved=true;
                  }
               }
+             if(player=='1')
+                createNode('H',firstRow-1,firstC-65,len,'1');
+             else
+                createNode('H',firstRow-1,firstC-65,len,'2');
 
              if (firstC-65>=1)
                {
@@ -334,7 +336,6 @@ void putShips(char player)
                  {
                   player1[j-1][firstC-65].state='o';
                   player1[j-1][firstC-65].isShip=true;
-                  createNode('V',firstRow-1,firstC-65,len,'1');
                   if (firstC-65>=1)
                     player1[j-1][firstC-65-1].isReserved=true;
                   if (firstC-65<=8)
@@ -344,13 +345,17 @@ void putShips(char player)
                  {
                   player2[j-1][firstC-65].state='o';
                   player2[j-1][firstC-65].isShip=true;
-                  createNode('V',firstRow-1,firstC-65,len,'2');
                   if (firstC-65>=1)
                     player2[j-1][firstC-65-1].isReserved=true;
                   if (firstC-65<=8)
                     player2[j-1][firstC-65+1].isReserved=true;
                  }
               }
+
+             if(player=='1')
+                createNode('V',firstRow-1,firstC-65,len,'1');
+             else
+                createNode('V',firstRow-1,firstC-65,len,'2');
 
              if (firstRow-1>=1)
                {
@@ -391,6 +396,9 @@ void putShips(char player)
     }
     system("cls");
   }
+ createBoard(player);
+ delay(2000);
+ system("cls");
 }
 
 /*
@@ -409,9 +417,392 @@ void hide (void)
      }
 }
 
+
+/*
+if linked lists become empty
+*/
+bool gameOver(void)
+{
+    if (head1==NULL || head2==NULL)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+}
+
+/*
+deletes list of a ship that is completely
+destroyed from linked list
+*/
+void deleteList (struct shipsList *ptr,char player)
+{
+  if (player=='1')
+    {
+      //if it is first node
+      if (ptr==head1)
+        {
+          head1=head1->next;
+        }
+      else
+        {
+          struct shipsList *p=head1;
+          while(p->next!=ptr)
+            {
+              p=p->next;
+            }
+          p->next=ptr->next;
+        }
+    }
+  else
+    {
+      //if it is first node
+      if (ptr==head2)
+        {
+          head2=head2->next;
+        }
+      else
+        {
+          struct shipsList *p=head2;
+          while(p->next!=ptr)
+            {
+              p=p->next;
+            }
+          p->next=ptr->next;
+        }
+    }
+}
+
+/*
+checks if all blocks of a ship
+are destroyed or not
+*/
+void checkCompleteExplosion (char player)
+{
+  struct shipsList *ptr=NULL;
+  bool allCrashed;
+  if (player=='1')
+   {
+     ptr=head1;
+     while(ptr!=NULL)
+       {
+         allCrashed=true;
+         if (ptr->direction=='H')
+           {
+             for(int i=0;i<ptr->len;i++)
+               {
+                 if(player1[ptr->firstRow][(ptr->firstC)+i].state!='E')
+                   {
+                     allCrashed=false;
+                     break;
+                   }
+               }
+             if(allCrashed)
+               {
+                 //change the state
+                 for (int i=0;i<ptr->len;i++)
+                   {
+                     player1[ptr->firstRow][(ptr->firstC)+i].state='C';
+                   }
+                 //coin
+                 //show reserved blocks
+                 if (ptr->firstRow>0)
+                   {
+                     for (int i=0;i<ptr->len;i++)
+                       {
+                         player1[(ptr->firstRow)-1][(ptr->firstC)+i].state='W';
+                       }
+                   }
+                if(ptr->firstRow<9)
+                   {
+                    for (int i=0;i<ptr->len;i++)
+                       {
+                         player1[(ptr->firstRow)+1][(ptr->firstC)+i].state='W';
+                       }
+                   }
+                if (ptr->firstC>0)
+                  {
+                    for (int i=0;i<3;i++)
+                      {
+                        player1[(ptr->firstRow)-1+i][(ptr->firstC)-1].state='W';
+                      }
+                  }
+                if ((ptr->firstC)+(ptr->len)-1<9)
+                  {
+                    for (int i=0;i<3;i++)
+                      {
+                        player1[(ptr->firstRow)-1+i][(ptr->firstC)+(ptr->len)].state='W';
+                      }
+                  }
+                deleteList(ptr,'1');
+                break;
+               }
+           }
+
+         else
+         {
+           for (int i=0;i<ptr->len;i++)
+             {
+               if (player1[(ptr->firstRow)+i][ptr->firstC].state!='E')
+                 {
+                   allCrashed=false;
+                   break;
+                 }
+             }
+           if (allCrashed)
+             {
+               for (int i=0;i<ptr->len;i++)
+                 {
+                   player1[(ptr->firstRow)+i][ptr->firstC].state='C';
+                 }
+               //coin
+               //show reserved blocks
+               if (ptr->firstC>0)
+                 {
+                   for (int i=0;i<ptr->len;i++)
+                     {
+                       player1[(ptr->firstRow)+i][(ptr->firstC)-1].state='W';
+                     }
+                 }
+               if(ptr->firstC<9)
+                 {
+                   for(int i=0;i<ptr->len;i++)
+                     {
+                       player1[(ptr->firstRow)+i][(ptr->firstC)+1].state='W';
+                     }
+                 }
+               if(ptr->firstRow>0)
+                 {
+                   for(int i=0;i<3;i++)
+                     {
+                       player1[(ptr->firstRow)-1][(ptr->firstC)-1+i].state='W';
+                     }
+                 }
+               if ((ptr->firstRow)+(ptr->len)-1<9)
+                 {
+                   for(int i=0;i<3;i++)
+                     {
+                       player1[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1+i].state='W';
+                     }
+                 }
+               deleteList(ptr,'1');
+               break;
+             }
+         }
+        ptr=ptr->next;
+       }
+   }
+  else
+    {
+     ptr=head2;
+     while(ptr!=NULL)
+       {
+         allCrashed=true;
+         if (ptr->direction=='H')
+           {
+             for(int i=0;i<ptr->len;i++)
+               {
+                 if(player2[ptr->firstRow][(ptr->firstC)+i].state!='E')
+                   {
+                     allCrashed=false;
+                     break;
+                   }
+               }
+             if(allCrashed)
+               {
+                 //change the state
+                 for (int i=0;i<ptr->len;i++)
+                   {
+                     player2[ptr->firstRow][(ptr->firstC)+i].state='C';
+                   }
+                 //coin
+                 //show reserved blocks
+                 if (ptr->firstRow>0)
+                   {
+                     for (int i=0;i<ptr->len;i++)
+                       {
+                         player2[(ptr->firstRow)-1][(ptr->firstC)+i].state='W';
+                       }
+                   }
+                if(ptr->firstRow<9)
+                   {
+                    for (int i=0;i<ptr->len;i++)
+                       {
+                         player2[(ptr->firstRow)+1][(ptr->firstC)+i].state='W';
+                       }
+                   }
+                if (ptr->firstC>0)
+                  {
+                    for (int i=0;i<3;i++)
+                      {
+                        player2[(ptr->firstRow)-1+i][(ptr->firstC)-1].state='W';
+                      }
+                  }
+                if ((ptr->firstC)+(ptr->len)-1<9)
+                  {
+                    for (int i=0;i<3;i++)
+                      {
+                        player2[(ptr->firstRow)-1+i][(ptr->firstC)+(ptr->len)].state='W';
+                      }
+                  }
+                deleteList(ptr,'2');
+                break;
+               }
+           }
+
+         else
+         {
+           for (int i=0;i<ptr->len;i++)
+             {
+               if (player2[(ptr->firstRow)+i][ptr->firstC].state!='E')
+                 {
+                   allCrashed=false;
+                   break;
+                 }
+             }
+           if (allCrashed)
+             {
+               for (int i=0;i<ptr->len;i++)
+                 {
+                   player2[(ptr->firstRow)+i][ptr->firstC].state='C';
+                 }
+               //coin
+               //show reserved blocks
+               if (ptr->firstC>0)
+                 {
+                   for (int i=0;i<ptr->len;i++)
+                     {
+                       player2[(ptr->firstRow)+i][(ptr->firstC)-1].state='W';
+                     }
+                 }
+               if(ptr->firstC<9)
+                 {
+                   for(int i=0;i<ptr->len;i++)
+                     {
+                       player2[(ptr->firstRow)+i][(ptr->firstC)+1].state='W';
+                     }
+                 }
+               if(ptr->firstRow>0)
+                 {
+                   for(int i=0;i<3;i++)
+                     {
+                       player2[(ptr->firstRow)-1][(ptr->firstC)-1+i].state='W';
+                     }
+                 }
+               if ((ptr->firstRow)+(ptr->len)-1<9)
+                 {
+                   for(int i=0;i<3;i++)
+                     {
+                       player2[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1+i].state='W';
+                     }
+                 }
+               deleteList(ptr,'2');
+               break;
+             }
+         }
+        ptr=ptr->next;
+       }
+    }
+}
+
+
+
+/*
+main function in game!!
+*/
+void gamePlay(void)
+{
+  int row;
+  char column;
+  static char player='1';
+  system("cls");
+  createBoard((player=='1')?'2':'1');
+  printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+  scanf("%d %c",&row,&column);
+  if (player=='1')
+    {
+      if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
+         || row<1 || column<'A')
+        {
+          do{
+            printf("you can't choose this!");
+            delay(1000);
+            system("cls");
+            createBoard('2');
+            printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+            scanf("%d %c",&row,&column);
+          }while(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
+                 || row<1 || column<'A');
+        }
+      if (player2[row-1][column-65].isShip)
+        {
+          player2[row-1][column-65].state='E';
+          checkCompleteExplosion('2');
+          system("cls");
+          createBoard('2');
+          delay(3000);
+        }
+     else
+        {
+          player2[row-1][column-65].state='W';
+          system("cls");
+          createBoard('2');
+          delay(3000);
+          player=(player=='1')?'2':'1';
+        }
+    }
+  else
+    {
+      if(player1[row-1][column-65].state!=' ' || row>10 || column>'J'
+         || row<1 || column<'A')
+        {
+          do{
+            printf("you can't choose this!");
+            delay(1000);
+            system("cls");
+            createBoard((player=='1')?'2':'1');
+            printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+            scanf("%d %c",&row,&column);
+          }while(player1[row-1][column-65].state!=' ' || row>10 || column>'J'
+                 || row<1 || column<'A');
+        }
+      if (player1[row-1][column-65].isShip)
+        {
+          player1[row-1][column-65].state='E';
+          checkCompleteExplosion('1');
+          system("cls");
+          createBoard('1');
+          delay(3000);
+        }
+     else
+        {
+          player1[row-1][column-65].state='W';
+          system("cls");
+          createBoard('1');
+          delay(3000);
+          player=(player=='1')?'2':'1';
+        }
+    }
+}
+
+
+
 int main()
 {
     makeEmpty();
     putShips('1');
+    putShips('2');
+    hide();
+    while(!gameOver())
+    {
+      gamePlay();
+    }
+
+    if(head1==NULL)
+        printf("player 2 win!");
+    else
+        printf("player 1 win!");
     return 0;
 }
