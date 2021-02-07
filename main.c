@@ -167,6 +167,12 @@ void putShips(char player)
           }
       if (firstRow==secondRow)
        {
+        if (firstC>secondC)
+          {
+            printf("reverse your input!");
+            delay(2000);
+            continue;
+          }
         len=secondC-firstC+1;
         if (len<=5 && len!=4)
           {
@@ -278,6 +284,12 @@ void putShips(char player)
        }
       else if (firstC==secondC)
        {
+        if(firstRow>secondRow)
+          {
+            printf("reverse your input!");
+            delay(2000);
+            continue;
+          }
         len=secondRow-firstRow+1;
         if (len<=5 && len!=4)
           {
@@ -747,7 +759,7 @@ void gamePlay(void)
             delay(1000);
             system("cls");
             createBoard('2');
-            printf("player %c choose the target (n X) ",(player=='1')?player1Name:player2Name);
+            printf("%s choose the target (n X) ",(player=='1')?player1Name:player2Name);
             scanf("%d %c",&row,&column);
           }while(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
                  || row<1 || column<'A');
@@ -780,7 +792,7 @@ void gamePlay(void)
             delay(1000);
             system("cls");
             createBoard((player=='1')?'2':'1');
-            printf("player %c choose the target (n X) ",(player=='1')?player1Name:player2Name);
+            printf("%s choose the target (n X) ",(player=='1')?player1Name:player2Name);
             scanf("%d %c",&row,&column);
           }while(player1[row-1][column-65].state!=' ' || row>10 || column>'J'
                  || row<1 || column<'A');
@@ -882,7 +894,7 @@ void showUsers(char player)
     rewind(fptr);
     while(fscanf(fptr,"%s %d\n",buffer,&coin)!=EOF)
      {
-      printf("%s \n",buffer);
+      printf("%s : %d\n",buffer,coin);
      }
     rewind(fptr);
     if (player=='1')
@@ -903,6 +915,7 @@ void showUsers(char player)
        {
          printf("this player doesn't exists\n");
          printf("it will be added as new player!\n");
+         delay(2500);
          int x=newUser(player1Name);
          coin1=0;
        }
@@ -979,7 +992,7 @@ void chooseUser(char player)
               {
                 delay(2000);
                 system("cls");
-                //player1Name={'\0'};
+                printf("enter your name...");
                 scanf("%s",player1Name);
                 x=newUser(player1Name);
               }while(x==1);
@@ -997,7 +1010,6 @@ void chooseUser(char player)
               {
                 delay(2000);
                 system("cls");
-                //player2Name={'\0'};
                 scanf("%s",player2Name);
                 x=newUser(player2Name);
               }while(x==1);
@@ -1043,24 +1055,183 @@ void coinSaver(int p1coins,int p2coins)
 /*
 works should be done after game over
 */
-void afterGame(void)
+void afterGame(int n)// n : number of players
 {
-  if(head1==NULL)
+  if(n==2)
   {
-    printf("player 2 win!");
-    int p2=points2+coin2;
-    int p1=(points1/2)+coin1;
-    coinSaver(p1,p2);
+    if(head1==NULL)
+     {
+       printf("%s win!",player2Name);
+       int p2=points2+coin2;
+       int p1=(points1/2)+coin1;
+       coinSaver(p1,p2);
+     }
+    else
+     {
+       printf("%s win!",player1Name);
+       int p1=points1+coin1;
+       int p2=(points2/2)+coin2;
+       coinSaver(p1,p2);
+     }
   }
-  else
-  {
-    printf("player 1 win!");
-    int p1=points1+coin1;
-    int p2=(points2/2)+coin2;
-    coinSaver(p1,p2);
-  }
+
+ else
+ {
+     if (head1==NULL)
+       {
+        printf("Bot win!");
+        coin1+=((points1)/2);
+       }
+     else
+       {
+        printf("%s win!",player1Name);
+        coin1+=points1;
+       }
+     FILE *fpin=fopen("users.txt","r");
+     FILE *fpout=fopen("temp.txt","w");
+     char buffer[50];int otherCoins;
+     while(fscanf(fpin,"%s %d\n",buffer,&otherCoins)!=EOF)
+       {
+         if(strcmp(buffer,player1Name)==0)
+           {
+            fprintf(fpout,"%s %d\n",player1Name,coin1);
+           }
+         else
+           {
+            fprintf(fpout,"%s %d\n",buffer,otherCoins);
+           }
+       }
+     fclose(fpout);
+     fclose(fpin);
+     remove("users.txt");
+     rename("temp.txt","users.txt");
+ }
 }
 
+/*
+put bot's ships
+*/
+void putBot(void)
+{
+  createNode('H',1,1,5,'2');
+  for(int i=0;i<5;i++)
+  {
+    player2[1][1+i].isShip=true;
+  }
+  createNode('V',4,2,3,'2');
+  for(int i=0;i<3;i++)
+  {
+    player2[4+i][2].isShip=true;
+  }
+  createNode('H',3,5,3,'2');
+  for(int i=0;i<3;i++)
+  {
+    player2[3][5+i].isShip=true;
+  }
+  createNode('H',5,4,2,'2');
+  for(int i=0;i<2;i++)
+  {
+    player2[5][4+i].isShip=true;
+  }
+  createNode('V',4,9,2,'2');
+  for(int i=0;i<2;i++)
+  {
+    player2[4+i][9].isShip=true;
+  }
+  createNode('V',7,0,2,'2');
+  for(int i=0;i<2;i++)
+  {
+    player2[7+i][0].isShip=true;
+  }
+  createNode('H',1,8,1,'2');
+  player2[1][8].isShip=true;
+  createNode('H',7,6,1,'2');
+  player2[7][6].isShip=true;
+  createNode('H',3,0,1,'2');
+  player2[3][0].isShip=true;
+  createNode('H',8,9,1,'2');
+  player2[8][9].isShip=true;
+}
+
+
+
+/*
+game play with bot
+*/
+void gamePlayBot(void)
+{
+  int row;
+  char column;
+  static char player='1';
+  system("cls");
+  if (player=='1')
+    {
+      createBoard('2');
+      printf("%s : %d\t%s : %d\n",player1Name,points1,"Bot",points2);
+      printf("%s choose the target (n X) ",player1Name);
+      scanf("%d %c",&row,&column);
+      if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
+         || row<1 || column<'A')
+        {
+          do{
+            printf("you can't choose this!");
+            delay(1000);
+            system("cls");
+            createBoard('2');
+            printf("%s choose the target (n X) ",player1Name);
+            scanf("%d %c",&row,&column);
+          }while(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
+                 || row<1 || column<'A');
+        }
+      if (player2[row-1][column-65].isShip)
+        {
+          player2[row-1][column-65].state='E';
+          points1++;
+          checkCompleteExplosion('2');
+          system("cls");
+          createBoard('2');
+          delay(3000);
+        }
+     else
+        {
+          player2[row-1][column-65].state='W';
+          system("cls");
+          createBoard('2');
+          delay(3000);
+          player=(player=='1')?'2':'1';
+        }
+    }
+  else
+    {
+      srand(time(NULL));
+      int r,c;
+      createBoard('1');
+      printf("bot is choosing target...");
+      delay(1500);
+      do
+      {
+        r=(rand()%10);
+        c=(rand()%10);
+      }while(((r>9)||(c>9))||(player1[r][c].state!=' '));
+      if (player1[r][c].isShip)
+        {
+          player1[r][c].state='E';
+          points2++;
+          checkCompleteExplosion('1');
+          system("cls");
+          createBoard('1');
+          delay(3000);
+        }
+     else
+        {
+          player1[r][c].state='W';
+          system("cls");
+          createBoard('1');
+          delay(3000);
+          player=(player=='1')?'2':'1';
+        }
+    }
+}
 
 
 /*
@@ -1068,6 +1239,9 @@ menu of game
 */
 void menu(void)
 {
+  int choice;
+  do{
+  system("cls");
   printf("1) Play with a Friend\n");
   printf("2) Play with bot\n");
   printf("3) Load game");
@@ -1075,8 +1249,8 @@ void menu(void)
   printf("5) Settings\n");
   printf("6) Score Board\n");
   printf("7) Exit\n");
-  int choice;
   scanf("%d",&choice);
+  }while(choice>7);
   switch (choice)
   {
    case 1:
@@ -1090,7 +1264,19 @@ void menu(void)
      {
        gamePlay();
      }
-     afterGame();
+     afterGame(2);
+     break;
+   case 2:
+     makeEmpty();
+     chooseUser('1');
+     putShips('1');
+     putBot();
+     hide();
+     while(!gameOver())
+       {
+         gamePlayBot();
+       }
+     afterGame(1);
      break;
   }
 }
