@@ -3,6 +3,7 @@
 #include <stdbool.h>
 #include <windows.h>
 #include <time.h>
+#include <string.h>
 
 
 /*
@@ -57,6 +58,11 @@ void createNode (char dir,int row,char column,int len,char player)
 /* blocks of game*/
 Info player1[10][10];
 Info player2[10][10];
+
+/*name of players and coins*/
+char player1Name[50]={'\0'},player2Name[50]={'\0'};
+int coin1,coin2;
+int points1=0,points2=0;
 
 /*
 make all the blocks empty before
@@ -136,6 +142,7 @@ and shows the preview of each player's map
 */
 void putShips(char player)
 {
+    system("cls");
     int numShips[4]={4,3,2,1};//number of ships
     int firstRow,secondRow;
     char firstC,secondC;
@@ -148,7 +155,7 @@ void putShips(char player)
       createBoard(player);
       printf("(5 : %d) , (3 : %d) , (2 : %d) , (1 : %d)\n\n"
              ,numShips[3],numShips[2],numShips[1],numShips[0]);
-      printf("player %c enter first and last coordinate(n X m Y) ",player);
+      printf("%s enter first and last coordinate(n X m Y) ",(player=='1')?player1Name:player2Name);
       scanf("%d %c %d %c",&firstRow,&firstC,&secondRow,&secondC);
       if (firstRow>10 || secondRow>10 || firstC>'J' || secondC>'J'||
           firstRow<0 || secondRow<0 || firstC<'A' || secondC<'A')
@@ -506,7 +513,7 @@ void checkCompleteExplosion (char player)
                    {
                      player1[ptr->firstRow][(ptr->firstC)+i].state='C';
                    }
-                 //coin
+                 points2+=(25/(ptr->len));
                  //show reserved blocks
                  if (ptr->firstRow>0)
                    {
@@ -524,17 +531,19 @@ void checkCompleteExplosion (char player)
                    }
                 if (ptr->firstC>0)
                   {
-                    for (int i=0;i<3;i++)
-                      {
-                        player1[(ptr->firstRow)-1+i][(ptr->firstC)-1].state='W';
-                      }
+                    if (ptr->firstRow>0)
+                        player1[(ptr->firstRow)-1][(ptr->firstC)-1].state='W';
+                    if (ptr->firstRow<9)
+                        player1[(ptr->firstRow)+1][(ptr->firstC)-1].state='W';
+                    player1[(ptr->firstRow)][(ptr->firstC)-1].state='W';
                   }
                 if ((ptr->firstC)+(ptr->len)-1<9)
                   {
-                    for (int i=0;i<3;i++)
-                      {
-                        player1[(ptr->firstRow)-1+i][(ptr->firstC)+(ptr->len)].state='W';
-                      }
+                    if (ptr->firstRow>0)
+                        player1[(ptr->firstRow)-1][(ptr->firstC)+(ptr->len)].state='W';
+                    if (ptr->firstRow<9)
+                        player1[(ptr->firstRow)+1][(ptr->firstC)+(ptr->len)].state='W';
+                    player1[(ptr->firstRow)][(ptr->firstC)+(ptr->len)].state='W';
                   }
                 deleteList(ptr,'1');
                 break;
@@ -557,7 +566,7 @@ void checkCompleteExplosion (char player)
                  {
                    player1[(ptr->firstRow)+i][ptr->firstC].state='C';
                  }
-               //coin
+               points2+=(25/(ptr->len));
                //show reserved blocks
                if (ptr->firstC>0)
                  {
@@ -575,17 +584,19 @@ void checkCompleteExplosion (char player)
                  }
                if(ptr->firstRow>0)
                  {
-                   for(int i=0;i<3;i++)
-                     {
-                       player1[(ptr->firstRow)-1][(ptr->firstC)-1+i].state='W';
-                     }
+                   if (ptr->firstC>0)
+                    player1[(ptr->firstRow)-1][(ptr->firstC)-1].state='W';
+                   if (ptr->firstC<9)
+                    player1[(ptr->firstRow)-1][(ptr->firstC)+1].state='W';
+                   player1[(ptr->firstRow)-1][(ptr->firstC)].state='W';
                  }
                if ((ptr->firstRow)+(ptr->len)-1<9)
                  {
-                   for(int i=0;i<3;i++)
-                     {
-                       player1[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1+i].state='W';
-                     }
+                   if(ptr->firstC>0)
+                    player1[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1].state='W';
+                   if(ptr->firstC<9)
+                    player1[(ptr->firstRow)+(ptr->len)][(ptr->firstC)+1].state='W';
+                   player1[(ptr->firstRow)+(ptr->len)][(ptr->firstC)].state='W';
                  }
                deleteList(ptr,'1');
                break;
@@ -617,7 +628,7 @@ void checkCompleteExplosion (char player)
                    {
                      player2[ptr->firstRow][(ptr->firstC)+i].state='C';
                    }
-                 //coin
+                 points1+=(25/(ptr->len));
                  //show reserved blocks
                  if (ptr->firstRow>0)
                    {
@@ -635,17 +646,19 @@ void checkCompleteExplosion (char player)
                    }
                 if (ptr->firstC>0)
                   {
-                    for (int i=0;i<3;i++)
-                      {
-                        player2[(ptr->firstRow)-1+i][(ptr->firstC)-1].state='W';
-                      }
+                    if (ptr->firstRow>0)
+                        player2[(ptr->firstRow)-1][(ptr->firstC)-1].state='W';
+                    if (ptr->firstRow<9)
+                         player2[(ptr->firstRow)+1][(ptr->firstC)-1].state='W';
+                     player2[(ptr->firstRow)][(ptr->firstC)-1].state='W';
                   }
                 if ((ptr->firstC)+(ptr->len)-1<9)
                   {
-                    for (int i=0;i<3;i++)
-                      {
-                        player2[(ptr->firstRow)-1+i][(ptr->firstC)+(ptr->len)].state='W';
-                      }
+                    if(ptr->firstRow>0)
+                         player2[(ptr->firstRow)-1][(ptr->firstC)+(ptr->len)].state='W';
+                    if(ptr->firstRow<9)
+                         player2[(ptr->firstRow)+1][(ptr->firstC)+(ptr->len)].state='W';
+                    player2[(ptr->firstRow)][(ptr->firstC)+(ptr->len)].state='W';
                   }
                 deleteList(ptr,'2');
                 break;
@@ -668,7 +681,7 @@ void checkCompleteExplosion (char player)
                  {
                    player2[(ptr->firstRow)+i][ptr->firstC].state='C';
                  }
-               //coin
+               points1+=(25/(ptr->len));
                //show reserved blocks
                if (ptr->firstC>0)
                  {
@@ -686,17 +699,19 @@ void checkCompleteExplosion (char player)
                  }
                if(ptr->firstRow>0)
                  {
-                   for(int i=0;i<3;i++)
-                     {
-                       player2[(ptr->firstRow)-1][(ptr->firstC)-1+i].state='W';
-                     }
+                   if(ptr->firstC>0)
+                    player2[(ptr->firstRow)-1][(ptr->firstC)-1].state='W';
+                   if(ptr->firstC<9)
+                    player2[(ptr->firstRow)-1][(ptr->firstC)+1].state='W';
+                   player2[(ptr->firstRow)-1][(ptr->firstC)].state='W';
                  }
                if ((ptr->firstRow)+(ptr->len)-1<9)
                  {
-                   for(int i=0;i<3;i++)
-                     {
-                       player2[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1+i].state='W';
-                     }
+                   if(ptr->firstC>0)
+                    player2[(ptr->firstRow)+(ptr->len)][(ptr->firstC)-1].state='W';
+                   if(ptr->firstC<9)
+                    player2[(ptr->firstRow)+(ptr->len)][(ptr->firstC)+1].state='W';
+                   player2[(ptr->firstRow)+(ptr->len)][(ptr->firstC)].state='W';
                  }
                deleteList(ptr,'2');
                break;
@@ -719,7 +734,8 @@ void gamePlay(void)
   static char player='1';
   system("cls");
   createBoard((player=='1')?'2':'1');
-  printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+  printf("%s : %d\t%s : %d\n",player1Name,points1,player2Name,points2);
+  printf("%s choose the target (n X) ",(player=='1')?player1Name:player2Name);
   scanf("%d %c",&row,&column);
   if (player=='1')
     {
@@ -731,7 +747,7 @@ void gamePlay(void)
             delay(1000);
             system("cls");
             createBoard('2');
-            printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+            printf("player %c choose the target (n X) ",(player=='1')?player1Name:player2Name);
             scanf("%d %c",&row,&column);
           }while(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
                  || row<1 || column<'A');
@@ -739,6 +755,7 @@ void gamePlay(void)
       if (player2[row-1][column-65].isShip)
         {
           player2[row-1][column-65].state='E';
+          points1++;
           checkCompleteExplosion('2');
           system("cls");
           createBoard('2');
@@ -763,7 +780,7 @@ void gamePlay(void)
             delay(1000);
             system("cls");
             createBoard((player=='1')?'2':'1');
-            printf("player %c choose the target (n X) ",(player=='1')?'1':'2');
+            printf("player %c choose the target (n X) ",(player=='1')?player1Name:player2Name);
             scanf("%d %c",&row,&column);
           }while(player1[row-1][column-65].state!=' ' || row>10 || column>'J'
                  || row<1 || column<'A');
@@ -771,6 +788,7 @@ void gamePlay(void)
       if (player1[row-1][column-65].isShip)
         {
           player1[row-1][column-65].state='E';
+          points2++;
           checkCompleteExplosion('1');
           system("cls");
           createBoard('1');
@@ -787,22 +805,298 @@ void gamePlay(void)
     }
 }
 
+/*
+add new users to the file
+*/
+int newUser(char *nu)
+{
+  char buf[50];
+  int temp;
+  bool exist=false;
+  FILE *fptr=fopen("users.txt","r");
+  //checks if player exist or not
+  while(fscanf(fptr,"%s %d\n",buf,&temp)!=EOF)
+  {
+    if (strcmp(buf,nu)==0)
+    {
+      exist=true;
+      break;
+    }
+  }
+  if (exist)
+    {
+     printf("this player exists in list!\nchoose another one");
+     fclose(fptr);
+     return 1; //cant be added
+    }
+  else
+    {
+     fclose(fptr);
+     fptr=fopen("users.txt","a");
+     fprintf(fptr,"%s %d\n",nu,0);
+     fclose(fptr);
+     return 0;
+    }
+}
 
+/*
+show lists of users
+*/
+void showUsers(char player)
+{
+  system("cls");
+  char buffer[50];
+  int coin;
+  bool found=false;
+  FILE *fptr=fopen("users.txt","r");
+  if (fptr==NULL)
+  {
+    printf("unable to open file...");
+    exit(-1);
+  }
+  fseek(fptr,0,SEEK_END);
+  unsigned long long int lenFile=(unsigned long long int)ftell(fptr);
+  if (lenFile==0)
+  {
+    printf("there isn't any player...\n");
+    printf("add new user : \n");
+    fclose(fptr);
+    int x;
+    do{
+      if (player=='1')
+      {
+        scanf("%s",player1Name);
+        x=newUser(player1Name);
+        coin1=0;
+      }
+      else
+      {
+        scanf("%s",player2Name);
+        x=newUser(player2Name);
+        coin2=0;
+      }
+    }while(x==1);
+  }
+  else
+  {
+    rewind(fptr);
+    while(fscanf(fptr,"%s %d\n",buffer,&coin)!=EOF)
+     {
+      printf("%s \n",buffer);
+     }
+    rewind(fptr);
+    if (player=='1')
+    {
+      printf("enter name...");
+      scanf("%s",player1Name);
+      while(fscanf(fptr,"%s %d\n",buffer,&coin)!=EOF)
+        {
+          if(strcmp(player1Name,buffer)==0)
+            {
+              coin1=coin;
+              found=true;
+              break;
+            }
+        }
+     fclose(fptr);
+     if (!found)
+       {
+         printf("this player doesn't exists\n");
+         printf("it will be added as new player!\n");
+         int x=newUser(player1Name);
+         coin1=0;
+       }
+    }
+
+   else
+    {
+      printf("enter name...");
+      scanf("%s",player2Name);
+      bool found=false;
+      while(fscanf(fptr,"%s %d\n",buffer,&coin)!=EOF)
+        {
+          if(strcmp(player2Name,buffer)==0)
+            {
+              coin2=coin;
+              found=true;
+              break;
+            }
+        }
+     if (!found)
+       {
+         printf("this player doesn't exists\n");
+         printf("add this to new players\n");
+         int x=newUser(player2Name);
+         coin2=0;
+       }
+    }
+  }
+}
+
+/*
+to show the menu of choose user
+*/
+void chooseUser(char player)
+{
+  system("cls");
+  int choice,x;
+  if (player=='1')
+    {
+      do
+      {
+        system("cls");
+        printf("First Player , choose user\n\n");
+        printf("1) choose from available users\n");
+        printf("2) new user\n");
+        scanf("%d",&choice);
+      }while(choice!=1 && choice!=2);
+    }
+  else
+    {
+      do{
+         system("cls");
+         printf("Second Player , choose user\n\n");
+         printf("1) choose from available users\n");
+         printf("2) new user\n");
+         scanf("%d",&choice);
+      }while(choice!=1 && choice!=2);
+    }
+  switch (choice)
+  {
+    case 1:
+      showUsers((player=='1')?'1':'2');
+      break;
+    case 2:
+      system("cls");
+      if (player=='1')
+        {
+          printf("enter your name...");
+          scanf("%s",player1Name);
+          x=newUser(player1Name);
+          if(x==1)
+            {
+              do
+              {
+                delay(2000);
+                system("cls");
+                //player1Name={'\0'};
+                scanf("%s",player1Name);
+                x=newUser(player1Name);
+              }while(x==1);
+            }
+          coin1=0;
+        }
+      else
+        {
+          printf("enter your name...");
+          scanf("%s",player2Name);
+          x=newUser(player2Name);
+          if(x==1)
+            {
+              do
+              {
+                delay(2000);
+                system("cls");
+                //player2Name={'\0'};
+                scanf("%s",player2Name);
+                x=newUser(player2Name);
+              }while(x==1);
+            }
+          coin2=0;
+        }
+      break;
+  }
+}
+
+
+/*
+after game over saves new coins to its
+player in the users file
+*/
+void coinSaver(int p1coins,int p2coins)
+{
+  FILE *fin=fopen("users.txt","r");
+  FILE *fout=fopen("temp.txt","w");
+  char buf[50];
+  int otherCoins;//other player's coins
+  while(fscanf(fin,"%s %d\n",buf,&otherCoins)!=EOF)
+    {
+      if (strcmp(buf,player1Name)==0)
+        {
+          fprintf(fout,"%s %d\n",player1Name,p1coins);
+        }
+      else if (strcmp(buf,player2Name)==0)
+        {
+          fprintf(fout,"%s %d\n",player2Name,p2coins);
+        }
+      else
+        {
+          fprintf(fout,"%s %d\n",buf,otherCoins);
+        }
+    }
+  fclose(fin);
+  fclose(fout);
+  remove("users.txt");
+  rename("temp.txt","users.txt");
+}
+
+/*
+works should be done after game over
+*/
+void afterGame(void)
+{
+  if(head1==NULL)
+  {
+    printf("player 2 win!");
+    int p2=points2+coin2;
+    int p1=(points1/2)+coin1;
+    coinSaver(p1,p2);
+  }
+  else
+  {
+    printf("player 1 win!");
+    int p1=points1+coin1;
+    int p2=(points2/2)+coin2;
+    coinSaver(p1,p2);
+  }
+}
+
+
+
+/*
+menu of game
+*/
+void menu(void)
+{
+  printf("1) Play with a Friend\n");
+  printf("2) Play with bot\n");
+  printf("3) Load game");
+  printf("4) Load last game\n");
+  printf("5) Settings\n");
+  printf("6) Score Board\n");
+  printf("7) Exit\n");
+  int choice;
+  scanf("%d",&choice);
+  switch (choice)
+  {
+   case 1:
+     makeEmpty();
+     chooseUser('1');
+     putShips('1');
+     chooseUser('2');
+     putShips('2');
+     hide();
+     while(!gameOver())
+     {
+       gamePlay();
+     }
+     afterGame();
+     break;
+  }
+}
 
 int main()
 {
-    makeEmpty();
-    putShips('1');
-    putShips('2');
-    hide();
-    while(!gameOver())
-    {
-      gamePlay();
-    }
-
-    if(head1==NULL)
-        printf("player 2 win!");
-    else
-        printf("player 1 win!");
+    menu();
     return 0;
 }
