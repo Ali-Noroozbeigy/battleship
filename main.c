@@ -1100,30 +1100,75 @@ player in the users file
 */
 void coinSaver(int p1coins,int p2coins)
 {
-  FILE *fin=fopen("users.txt","r");
-  FILE *fout=fopen("temp.txt","w");
-  char buf[50];
-  int otherCoins;//coins that each player has before
-  while(fscanf(fin,"%s %d\n",buf,&otherCoins)!=EOF)
+  FILE *fptr=fopen("users.txt","r");
+  char names[100][50];
+  int i=0;
+  int otherCoins[100];//coins that each player has before
+  while(fscanf(fptr,"%s %d\n",names[i],&otherCoins[i])!=EOF)
     {
-      if (strcmp(buf,player1Name)==0)
+      i++;
+    }
+  fclose(fptr);
+  fptr=fopen("users.txt","w");
+  for (int j=0;j<i;j++)
+  {
+    if(strcmp(names[j],player1Name)==0)
+      {
+        fprintf(fptr,"%s %d\n",player1Name,otherCoins[j]+p1coins);
+      }
+    else if(strcmp(names[j],player2Name)==0)
+      {
+        fprintf(fptr,"%s %d\n",player2Name,otherCoins[j]+p2coins);
+      }
+    else
+      {
+        fprintf(fptr,"%s %d\n",names[j],otherCoins[j]);
+      }
+  }
+ fclose(fptr);
+}
+
+/*
+sorting users according to
+their points in users.txt
+*/
+void sortUsers(void)
+{
+  char names[100][50],tempC[50];
+  int points[100];
+  int i=0,j,k,temp;
+  FILE *fptr=fopen("users.txt","r");
+  while(fscanf(fptr,"%s %d\n",names[i],&points[i])!=EOF)
+  {
+    i++;
+  }
+  fclose(fptr);
+  //bubble sort!
+  for(j=0;j<i;j++)
+    {
+      for(k=j+1;k<i;k++)
         {
-          fprintf(fout,"%s %d\n",player1Name,p1coins+otherCoins);
-        }
-      else if (strcmp(buf,player2Name)==0)
-        {
-          fprintf(fout,"%s %d\n",player2Name,p2coins+otherCoins);
-        }
-      else
-        {
-          fprintf(fout,"%s %d\n",buf,otherCoins);
+          if (points[j]<points[k])
+            {
+              temp=points[j];
+              points[j]=points[k];
+              points[k]=temp;
+              //swap for string!
+              strcpy(tempC,names[j]);
+              strcpy(names[j],names[k]);
+              strcpy(names[k],tempC);
+            }
         }
     }
-  fclose(fin);
-  fclose(fout);
-  remove("users.txt");
-  rename("temp.txt","users.txt");
+  fptr=fopen("users.txt","w");
+  for(j=0;j<i;j++)
+  {
+    fprintf(fptr,"%s %d\n",names[j],points[j]);
+  }
+  fclose(fptr);
 }
+
+
 
 /*
 works should be done after game over
@@ -1160,25 +1205,30 @@ void afterGame(int n)// n : number of players
         printf("%s win!",player1Name);
        }
      //it's like coinSaver but for single player!
-     FILE *fpin=fopen("users.txt","r");
-     FILE *fpout=fopen("temp.txt","w");
-     char buffer[50];int otherCoins;
-     while(fscanf(fpin,"%s %d\n",buffer,&otherCoins)!=EOF)
+     FILE *fptr=fopen("users.txt","r");
+     char names[100][50];int otherCoins[100];
+     int i=0;
+     while(fscanf(fptr,"%s %d\n",names[i],&otherCoins[i])!=EOF)
        {
-         if(strcmp(buffer,player1Name)==0)
+         i++;
+       }
+     fclose(fptr);
+     fptr=fopen("users.txt","w");
+     for (int j=0;j<i;j++)
+       {
+         if (strcmp(names[j],player1Name)==0)
            {
-            fprintf(fpout,"%s %d\n",player1Name,otherCoins+points1);
+             fprintf(fptr,"%s %d\n",player1Name,otherCoins[j]+points1);
            }
          else
            {
-            fprintf(fpout,"%s %d\n",buffer,otherCoins);
+             fprintf(fptr,"%s %d\n",names[j],otherCoins[j]);
            }
        }
-     fclose(fpout);
-     fclose(fpin);
-     remove("users.txt");
-     rename("temp.txt","users.txt");
+     fclose(fptr);
+
  }
+ sortUsers();
 }
 
 /*
@@ -1619,6 +1669,21 @@ char loadLastGame(void)
   return turn;
 }
 
+/*
+shows score board
+*/
+void scoreBoard(void)
+{
+ sortUsers();
+ char buf[50];
+ int point;
+ FILE *fptr=fopen("users.txt","r");
+ while(fscanf(fptr,"%s %d\n",buf,&point)!=EOF)
+ {
+   printf("%s : %d points\n",buf,point);
+ }
+ fclose(fptr);
+}
 
 
 /*
@@ -1714,6 +1779,10 @@ void menu(void)
        }
      break;
     }
+   case 6:
+     system("cls");
+     scoreBoard();
+     break;
   }
 }
 
