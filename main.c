@@ -260,23 +260,41 @@ void putShips(char player)
 
              if (firstC-65>=1)
                {
-                 for (int j=0;j<3;j++)
-                   {
-                    if (player=='1')
-                     player1[firstRow-2+j][firstC-65-1].isReserved=true;
-                    else
-                     player2[firstRow-2+j][firstC-65-1].isReserved=true;
-                   }
+                  if (player=='1')
+                    {
+                      if (firstRow-1>=1)
+                         player1[firstRow-2][firstC-65-1].isReserved=true;
+                      if (firstRow-1<=8)
+                         player1[firstRow][firstC-65-1].isReserved=true;
+                      player1[firstRow-1][firstC-65-1].isReserved=true;
+                    }
+                  else
+                    {
+                      if (firstRow-1>=1)
+                         player2[firstRow-2][firstC-65-1].isReserved=true;
+                      if (firstRow-1<=8)
+                         player2[firstRow][firstC-65-1].isReserved=true;
+                      player2[firstRow-1][firstC-65-1].isReserved=true;
+                    }
                }
              if (secondC-65<=8)
                {
-                 for (int j=0;j<3;j++)
-                   {
-                    if (player=='1')
-                     player1[firstRow-2+j][secondC-65+1].isReserved=true;
-                    else
-                     player2[firstRow-2+j][secondC-65+1].isReserved=true;
-                   }
+                  if (player=='1')
+                    {
+                      if (firstRow-1>=1)
+                        player1[firstRow-2][secondC-65+1].isReserved=true;
+                      if (firstRow-1<=8)
+                        player1[firstRow][secondC-65+1].isReserved=true;
+                      player1[firstRow-1][secondC-65+1].isReserved=true;
+                    }
+                  else
+                    {
+                      if (firstRow-1>=1)
+                        player2[firstRow-2][secondC-65+1].isReserved=true;
+                      if (firstRow-1<=8)
+                        player2[firstRow][secondC-65+1].isReserved=true;
+                      player2[firstRow-1][secondC-65+1].isReserved=true;
+                    }
                }
 
              i++;
@@ -378,31 +396,41 @@ void putShips(char player)
 
              if (firstRow-1>=1)
                {
-                 for (int j=0;j<3;j++)
-                   {
-                     if (player=='1')
-                       {
-                         player1[firstRow-2][firstC-65-1+j].isReserved=true;
-                       }
-                     else
-                       {
-                         player2[firstRow-2][firstC-65-1+j].isReserved=true;
-                       }
-                   }
+                 if (player=='1')
+                    {
+                      if(firstC-65>=1)
+                        player1[firstRow-2][firstC-1].isReserved=true;
+                      if(firstC-65<=8)
+                        player1[firstRow-2][firstC+1].isReserved=true;
+                      player1[firstRow-2][firstC].isReserved=true;
+                    }
+                 else
+                    {
+                      if(firstC-65>=1)
+                        player2[firstRow-2][firstC-1].isReserved=true;
+                      if(firstC-65<=8)
+                        player2[firstRow-2][firstC+1].isReserved=true;
+                      player2[firstRow-2][firstC].isReserved=true;
+                    }
                }
              if (secondRow-1<=8)
                {
-                 for (int j=0;j<3;j++)
-                   {
-                     if (player=='1')
-                       {
-                         player1[firstRow-1+1][firstC-65-1+j].isReserved=true;
-                       }
-                     else
-                       {
-                         player2[firstRow-1+1][firstC-65-1+j].isReserved=true;
-                       }
-                   }
+                 if (player=='1')
+                    {
+                       if (firstC-65>=1)
+                         player1[secondRow-1+1][firstC-65-1].isReserved=true;
+                       if (firstC-65<=8)
+                         player1[secondRow-1+1][firstC-65+1].isReserved=true;
+                       player1[secondRow-1+1][firstC-65].isReserved=true;
+                    }
+                 else
+                    {
+                       if (firstC-65>=1)
+                         player2[secondRow-1+1][firstC-65-1].isReserved=true;
+                       if (firstC-65<=8)
+                         player2[secondRow-1+1][firstC-65+1].isReserved=true;
+                       player2[secondRow-1+1][firstC-65].isReserved=true;
+                    }
                }
 
              i++;
@@ -814,6 +842,145 @@ void save(char turn)
      exit(-1);
 }
 
+/*
+use missile by inputing (-2 M)
+*/
+bool missile(char player)
+{
+ system("cls");
+ createBoard(player=='1'?'2':'1');
+ char choice;
+ bool firstE=false;//when reach first E state
+ printf("enter the row or column you want to attack (n / X) ");
+ fflush(stdin);
+ scanf("%c",&choice);
+ fflush(stdin);
+ if (!(choice>='1' && choice<='9') && !(choice>='A' && choice<='J'))
+   {
+     do{
+       printf("invalid input!");
+       delay(1500);
+       system("cls");
+       createBoard(player=='1'?'2':'1');
+       printf("enter the row or column you want to attack (n / X) ");
+       scanf("%c",&choice);
+       fflush(stdin);
+     }while(!(choice>='A' && choice<='j') && !(choice>='1' && choice<='9'));
+   }
+  if (choice>='A' && choice<='J')
+    {
+      if (player=='1')
+      {
+        for (int i=0;i<10;i++)
+          {
+            system("cls");
+            createBoard('2');
+            delay(1500);
+            if(firstE)
+                return firstE;
+            if (player2[i][choice-65].state==' ')
+              {
+                if(player2[i][choice-65].isShip==true)
+                  {
+                    player2[i][choice-65].state='E';
+                    firstE=true;
+                  }
+                else
+                  {
+                    player2[i][choice-65].state='W';
+                  }
+              }
+          }
+        createBoard('2');
+        delay(1500);
+        return firstE;
+      }
+     else
+      {
+        for (int i=0;i<10;i++)
+          {
+            system("cls");
+            createBoard('1');
+            delay(1500);
+            if(firstE)
+                return firstE;
+            if (player1[i][choice-65].state==' ')
+              {
+                if(player1[i][choice-65].isShip==true)
+                  {
+                    player1[i][choice-65].state='E';
+                    firstE=true;
+                  }
+                else
+                  {
+                    player1[i][choice-65].state='W';
+                  }
+              }
+          }
+        createBoard('1');
+        delay(1500);
+        return firstE;
+      }
+    }
+  else
+  {
+    if (player=='1')
+      {
+        for(int i=0;i<10;i++)
+          {
+            system("cls");
+            createBoard('2');
+            delay(1500);
+            if(firstE)
+                return firstE;
+            if (player2[choice-49][i].state==' ')
+              {
+                if (player2[choice-49][i].isShip==true)
+                  {
+                    player2[choice-49][i].state='E';
+                    firstE=true;
+                  }
+                else
+                  {
+                    player2[choice-49][i].state='W';
+                  }
+              }
+          }
+        createBoard('2');
+        delay(1500);
+        return firstE;
+      }
+    else
+      {
+        for(int i=0;i<10;i++)
+          {
+            system("cls");
+            createBoard('1');
+            delay(1500);
+            if(firstE)
+                return firstE;
+            if (player1[choice-49][i].state==' ')
+              {
+                if (player1[choice-49][i].isShip==true)
+                  {
+                    player1[choice-49][i].state='E';
+                    firstE=true;
+                  }
+                else
+                  {
+                    player1[choice-49][i].state='W';
+                  }
+              }
+          }
+        createBoard('1');
+        delay(1500);
+        return firstE;
+      }
+
+  }
+}
+
+
 
 /*
 main function in game!!
@@ -830,6 +997,25 @@ void gamePlay(void)
   scanf("%d %c",&row,&column);
   if (row==-1 && column=='S')
     save((player=='1'?'1':'2'));
+  if (row==-2 && column=='M')
+    {
+      if ((player=='1' && points1<100) || (player=='2' && points2<100))
+        {
+          printf("you don't have enough point to use missile!");
+          delay(2000);
+          return;
+        }
+      if (player=='1')
+            points1-=100;
+      else
+            points2-=100;
+      bool missilleCrashed=missile(player);
+      if (!missilleCrashed)
+        {
+          player=player=='1'?'2':'1';
+        }
+      return;
+    }
   if (player=='1')
     {
       if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
@@ -1298,6 +1484,22 @@ void gamePlayBot(void)
       scanf("%d %c",&row,&column);
       if (row==-1 && column=='S')
         save('1');
+      if (row==-2 && column=='M')
+       {
+         if ((points1<100))
+          {
+          printf("you don't have enough point to use missile!");
+          delay(2000);
+          return;
+          }
+        points1-=100;
+        bool missilleCrashed=missile(player);
+        if (!missilleCrashed)
+         {
+          player=player=='1'?'2':'1';
+         }
+       return;
+    }
       if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
          || row<1 || column<'A')
         {
@@ -1385,6 +1587,25 @@ void gamePlayS(char turn)
   scanf("%d %c",&row,&column);
   if (row==-1 && column=='S')
     save((player=='1'?'1':'2'));
+  if (row==-2 && column=='M')
+    {
+      if ((player=='1' && points1<100) || (player=='2' && points2<100))
+        {
+          printf("you don't have enough point to use missile!");
+          delay(2000);
+          return;
+        }
+      if (player=='1')
+            points1-=100;
+      else
+            points2-=100;
+      bool missilleCrashed=missile(player);
+      if (!missilleCrashed)
+        {
+          player=player=='1'?'2':'1';
+        }
+      return;
+    }
   if (player=='1')
     {
       if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
@@ -1478,6 +1699,22 @@ void gamePlayBotS(char turn)
       scanf("%d %c",&row,&column);
       if (row==-1 && column=='S')
         save('1');
+      if (row==-2 && column=='M')
+       {
+         if ((points1<100))
+          {
+          printf("you don't have enough point to use missile!");
+          delay(2000);
+          return;
+          }
+        points1-=100;
+        bool missilleCrashed=missile(player);
+        if (!missilleCrashed)
+         {
+          player=player=='1'?'2':'1';
+         }
+       return;
+    }
       if(player2[row-1][column-65].state!=' ' || row>10 || column>'J'
          || row<1 || column<'A')
         {
