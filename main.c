@@ -839,7 +839,7 @@ void save(char turn)
      system("cls");
      printf("game has been saved successfully!\n");
      delay(2000);
-     exit(-1);
+     exit(1);
 }
 
 /*
@@ -883,6 +883,7 @@ bool missile(char player)
                 if(player2[i][choice-65].isShip==true)
                   {
                     player2[i][choice-65].state='E';
+                    points1++;
                     firstE=true;
                   }
                 else
@@ -909,6 +910,7 @@ bool missile(char player)
                 if(player1[i][choice-65].isShip==true)
                   {
                     player1[i][choice-65].state='E';
+                    points2++;
                     firstE=true;
                   }
                 else
@@ -938,6 +940,7 @@ bool missile(char player)
                 if (player2[choice-49][i].isShip==true)
                   {
                     player2[choice-49][i].state='E';
+                    points1++;
                     firstE=true;
                   }
                 else
@@ -964,6 +967,7 @@ bool missile(char player)
                 if (player1[choice-49][i].isShip==true)
                   {
                     player1[choice-49][i].state='E';
+                    points2++;
                     firstE=true;
                   }
                 else
@@ -1903,6 +1907,7 @@ char loadLastGame(void)
        fread(&l,sizeof(int),1,fptr);
        createNode(dir,r,c,l,'2');
     }
+  fclose(fptr);
   return turn;
 }
 
@@ -1930,16 +1935,17 @@ void menu(void)
 {
   int choice;
   do{
-  system("cls");
-  printf("1) Play with a Friend\n");
-  printf("2) Play with bot\n");
-  printf("3) Load game\n");
-  printf("4) Load last game\n");
-  printf("5) Settings\n");
-  printf("6) Score Board\n");
-  printf("7) Exit\n");
-  scanf("%d",&choice);
-  }while(choice>7);
+    do{
+     system("cls");
+     printf("1) Play with a Friend\n");
+     printf("2) Play with bot\n");
+     printf("3) Load game\n");
+     printf("4) Load last game\n");
+     printf("5) Settings\n");
+     printf("6) Score Board\n");
+     printf("7) Exit\n");
+     scanf("%d",&choice);
+    }while(choice>7);
   switch (choice)
   {
    case 1:
@@ -1954,6 +1960,8 @@ void menu(void)
        gamePlay();
      }
      afterGame(2);
+     printf("\n\nyou will be forwarded to main menu in few seconds...");
+     delay(4000);
      break;
    case 2:
      makeEmpty();
@@ -1966,6 +1974,8 @@ void menu(void)
          gamePlayBot();
        }
      afterGame(1);
+     printf("\n\nyou will be forwarded to main menu in few seconds...");
+     delay(4000);
      break;
    case 3:
      {
@@ -1991,6 +2001,8 @@ void menu(void)
              }
            afterGame(2);
          }
+       printf("\n\nyou will be forwarded to main menu in few seconds...");
+       delay(4000);
        break;
      }
    case 4:
@@ -2014,13 +2026,26 @@ void menu(void)
          }
          afterGame(2);
        }
+     printf("\n\nyou will be forwarded to main menu in few seconds...");
+     delay(4000);
      break;
     }
+   case 5:
+     system("cls");
+     printf("nothing to show yet!!");
+     delay(2000);
+     break;
    case 6:
      system("cls");
      scoreBoard();
+     delay(3000);
+     printf("\n\nyou will be forwarded to main menu in few seconds...");
+     delay(4000);
+     break;
+   default:
      break;
   }
+  }while(choice!=7);
 }
 
 int main()
